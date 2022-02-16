@@ -92,3 +92,24 @@ add.bind(sub, 5, 3)(); // 调用后，返回 8
 ```
 如果 bind 的第一个参数是 null 或者 undefined，this 就指向全局对象 window
 
+# bind用apply和call实现
+```js
+function bind(fn
+/*: Function */
+, ctx
+/*: Object */
+) {
+  if (!fn) return false;
+
+  function boundFn(a) {
+    var l
+    /*: number */
+    = arguments.length;
+    return l ? l > 1 ? fn.apply(ctx, arguments) : fn.call(ctx, a) : fn.call(ctx);
+  } // record original fn length
+
+
+  boundFn._length = fn.length;
+  return boundFn;
+}
+```
