@@ -24,15 +24,14 @@ function initState (vm) {
     initWatch(vm, opts.watch);
   }
 }
-
-// # vue的响应式实现模拟
-class Vue{
+//  vue.js
+class Vue {
   constructor(options) {
-    // 1.保存选项配置属性
+    // 1.初始化操作：保存选项配置属性
     this.$options = options || {};
     this.$data = options.data || {};
     this.$el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el
-    // 2.拦截data属性的getter和setter，注入到vue实例中
+    // 2.把data的成员转换成getter和setter，注入到vue实例中
     this._proxyData(this.$data)
     // 3.监听数据变化
     new Observer(this.$data)
@@ -47,9 +46,25 @@ class Vue{
       this.defineReactive(data, key, data[key])
     })
   }
+}
+// observer.js
+// # vue的响应式实现模拟
+class Observer {
+  constructor(data) {
+    // 遍历data成员转换成getter和setter，注入到vue实例中
+    this._proxyData(data)
+  }
+  _proxyData(data){
+    if(!data || typeof data !== 'Object') {
+      return
+    }
+    Object.keys(data).forEach(key => {
+      this.defineReactive(data, key, data[key])
+    })
+  }
   defineReactive(obj, key, val) {
     const _this = this;
-    // 如果对象的属性值是对象，也要递归转为响应式拦截
+    //* 如果val是对象，也把val的属性递归转为响应式数据
     this._proxyData(val)
     // 把data属性注入到vue实例中,obj相当于this.$data
     Object.defineProperty(obj, key, {
@@ -63,7 +78,7 @@ class Vue{
         if(newVal == val) { return }
         val = newVal
         // this这里指向data
-        // 如果新赋值是对象，将对象的属性转为响应式
+        //* 如果新赋值是对象，将对象的属性转为响应式
         _this._proxyData(newVal)
       }
     })
@@ -90,6 +105,7 @@ vm.msg = {
   err: '400'
 }
 
+// compile.js
 // 编译器
 class Compiler {
   constructor(vm) {
@@ -167,3 +183,8 @@ class Compiler {
     return node.nodeType === 1
   }
 }
+
+
+
+
+
